@@ -1,167 +1,83 @@
 package model;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import dao.ClienteDAO;
 
 public class Cliente {
 	private int id;
 	private String nome;
 	private String fone;
 	private String email;
+	private ClienteDAO dao;
 
-	static {
-		try {
-			Class.forName("com.mysql.jdbc.Driver");
-		} catch (ClassNotFoundException e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
 	public Cliente(){
-		
+		dao = new ClienteDAO();
 	}
-
 
 	public Cliente(int id, String nome, String fone, String email) {
 		this.id = id;
 		this.nome = nome;
 		this.fone = fone;
 		this.email = email;
+		dao = new ClienteDAO();
 	}
-
-
 	
-	// Obtém conexão com o banco de dados
-	public Connection obtemConexao() throws SQLException {
-		return DriverManager
-				.getConnection("jdbc:mysql://localhost/vendas?user=alunos&password=alunos");
-	}
-
 	public void criar() {
-		String sqlInsert = "INSERT INTO cliente(nome, fone, email) VALUES (?, ?, ?)";
-		// usando o try with resources do Java 7, que fecha o que abriu
-		try (Connection conn = obtemConexao();
-				PreparedStatement stm = conn.prepareStatement(sqlInsert);) {
-			stm.setString(1, getNome());
-			stm.setString(2, getFone());
-			stm.setString(3, getEmail());
-			stm.execute();
-			String sqlQuery  = "SELECT LAST_INSERT_ID()";
-			try(PreparedStatement stm2 = conn.prepareStatement(sqlQuery);
-				ResultSet rs = stm2.executeQuery();) {
-				if(rs.next()){
-					setId(rs.getInt(1));
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		dao.criar(this);
 	}
 
 	public void atualizar() {
-		String sqlUpdate = "UPDATE cliente SET nome=?, fone=?, email=? WHERE id=?";
-		// usando o try with resources do Java 7, que fecha o que abriu
-		try (Connection conn = obtemConexao();
-				PreparedStatement stm = conn.prepareStatement(sqlUpdate);) {
-			stm.setString(1, getNome());
-			stm.setString(2, getFone());
-			stm.setString(3, getEmail());
-			stm.setInt(4, getId());
-			stm.execute();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		dao.atualizar(this);
 	}
 
 	public void excluir() {
-		String sqlDelete = "DELETE FROM cliente WHERE id = ?";
-		// usando o try with resources do Java 7, que fecha o que abriu
-		try (Connection conn = obtemConexao();
-				PreparedStatement stm = conn.prepareStatement(sqlDelete);) {
-			stm.setInt(1, getId());
-			stm.execute();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		dao.excluir(this);
 	}
 
 	public void carregar() {
-		String sqlSelect = "SELECT nome, fone, email FROM cliente WHERE cliente.id = ?";
-		// usando o try with resources do Java 7, que fecha o que abriu
-		try (Connection conn = obtemConexao();
-				PreparedStatement stm = conn.prepareStatement(sqlSelect);) {
-			stm.setInt(1, getId());
-			try (ResultSet rs = stm.executeQuery();) {
-				if (rs.next()) {
-					setNome(rs.getString("nome"));
-					setFone(rs.getString("fone"));
-					setEmail(rs.getString("email"));
-				} else {
-					setId(-1);
-					setNome(null);
-					setFone(null);
-					setEmail(null);
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		} catch (SQLException e1) {
-			System.out.print(e1.getStackTrace());
-		}
+		Cliente cliente = dao.carregar(id);
+		setNome(cliente.getNome());
+		setFone(cliente.getFone());
+		setEmail(cliente.getEmail());
+		setId(cliente.getId());
 	}
-
 
 	public int getId() {
 		return id;
 	}
 
-
 	public void setId(int id) {
 		this.id = id;
 	}
-
 
 	public String getNome() {
 		return nome;
 	}
 
-
 	public void setNome(String nome) {
 		this.nome = nome;
 	}
-
 
 	public String getFone() {
 		return fone;
 	}
 
-
 	public void setFone(String fone) {
 		this.fone = fone;
 	}
-
 
 	public String getEmail() {
 		return email;
 	}
 
-
 	public void setEmail(String email) {
 		this.email = email;
 	}
-
 
 	@Override
 	public String toString() {
 		return "Cliente [id=" + id + ", nome=" + nome + ", fone=" + fone
 				+ ", email=" + email + "]";
 	}
-
 
 	@Override
 	public boolean equals(Object obj) {
