@@ -2,11 +2,13 @@ package model;
 
 import java.util.ArrayList;
 
-import dao.Usuario_DAO;
+import dao.UsuarioDAO;
 
 public class Usuario {
 	
-	private String perfil, login, senha, loginNovoUtilizeParaAlterar;
+	private String nome, perfil, login, senha, loginNovoUtilizeParaAlterar;
+	private int id;
+
 
 	public Usuario(){
 		
@@ -22,13 +24,30 @@ public class Usuario {
 		this.senha = senha;
 	}
 	
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+	
+	public String getNome() {
+		return nome;
+	}
+
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
+
 	
 	public boolean logar(){
 		
 		try{
-			Usuario_DAO usuario = new Usuario_DAO();
+			UsuarioDAO usuario = new UsuarioDAO();
 			usuario.setNome(getLogin());
-			ArrayList<String> dadosbd = usuario.consultar();
+			ArrayList<String> dadosbd = usuario.carregar(2);
 			
 			if(dadosbd != null && dadosbd.get(1).equals(getSenha())){
 				return true;
@@ -71,7 +90,7 @@ public class Usuario {
 	public ArrayList<String> consultar(){
 		if(getLogin() != null){
 			
-			Usuario_DAO usuario = new Usuario_DAO();
+			UsuarioDAO usuario = new UsuarioDAO();
 			usuario.setNome(getLogin());
 			return usuario.consultar();
 		
@@ -86,7 +105,7 @@ public class Usuario {
 		if(getLogin() != null){
 		
 			//Verifica se o login informado para alteração já não existe
-			Usuario_DAO usuario = new Usuario_DAO();
+			UsuarioDAO usuario = new UsuarioDAO();
 			usuario.setNome(getLoginNovoUtilizeParaAlterar());
 			
 			if(usuario.consultar().size()==0){
@@ -110,7 +129,7 @@ public class Usuario {
 		
 		if(getPerfil() != null && getLogin() != null){
 		
-			Usuario_DAO usuario = new Usuario_DAO();
+			UsuarioDAO usuario = new UsuarioDAO();
 			usuario.setNome		(getLogin());
 			usuario.setPerfil	(getPerfil());
 			return usuario.alterarPerfil();
@@ -124,7 +143,7 @@ public class Usuario {
 		
 		if(getPerfil() != null && getLogin() != null){
 		
-			Usuario_DAO usuario = new Usuario_DAO();
+			UsuarioDAO usuario = new UsuarioDAO();
 			usuario.setNome		(getLogin());
 			usuario.setSenha	(getSenha());
 			return usuario.alterarSenha();
@@ -139,7 +158,7 @@ public class Usuario {
 		try{
 			if(getLogin() != null){
 				
-				Usuario_DAO usuario = new Usuario_DAO();
+				UsuarioDAO usuario = new UsuarioDAO();
 				usuario.setNome(getLogin());
 				return usuario.excluir();
 				
@@ -164,7 +183,7 @@ public class Usuario {
 		try{	
 			if(getPerfil() != null && getLogin() != null && getSenha() != null){//Valida se todos os campos foram preenchidos
 				
-				Usuario_DAO usuario = new Usuario_DAO();
+				UsuarioDAO usuario = new UsuarioDAO();
 				usuario.setNome(getLogin());
 				usuario.setSenha(getSenha());
 				usuario.setPerfil(getPerfil());
